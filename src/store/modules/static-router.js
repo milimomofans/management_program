@@ -42,17 +42,19 @@ function hasRole(roles, route) {
   }
 }
 
-function filterAsyncRouter (routerMap, role) {
-  const accessedRouters = routerMap.filter(route => {
-    if (hasPermission(role.permissionList, route)) {
-      if (route.children && route.children.length) {
-        route.children = filterAsyncRouter(route.children, role)
-      }
-      return true
-    }
-    return false
-  })
-  return accessedRouters
+function filterAsyncRouter (routerMap) {
+  // const accessedRouters = routerMap.filter(route => {
+  //   if (hasPermission(role.permissionList, route)) {
+  //     if (route.children && route.children.length) {
+  //       route.children = filterAsyncRouter(route.children, role)
+  //     }
+  //     return true
+  //   }
+  //   return false
+  // })
+  // return accessedRouters
+  console.log(routerMap)
+  return routerMap
 }
 
 const permission = {
@@ -69,10 +71,10 @@ const permission = {
   actions: {
     GenerateRoutes ({ commit }, data) {
       return new Promise(resolve => {
-        const { role } = data
+        // const { role } = data
         const routerMap = cloneDeep(asyncRouterMap)
-        const accessedRouters = filterAsyncRouter(routerMap, role)
-        commit('SET_ROUTERS', accessedRouters)
+        // const accessedRouters = filterAsyncRouter(routerMap)
+        commit('SET_ROUTERS', routerMap)
         resolve()
       })
     }

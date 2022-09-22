@@ -12,10 +12,14 @@ const user = {
     welcome: '',
     avatar: '',
     roles: [],
-    info: {}
+    info: {},
+    userInfo:{}
   },
 
   mutations: {
+    SET_USERINFO:( state, userInfo ) => {
+      state.userInfo = userInfo
+    },
     SET_TOKEN: (state, token) => {
       state.token = token
     },
@@ -36,12 +40,15 @@ const user = {
 
   actions: {
     // 登录
-    Login ({ commit }, userInfo) {
+    Login ({ commit, dispatch }, userInfo) {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
-          const result = response.result
-          storage.set(ACCESS_TOKEN, result.token, new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
-          commit('SET_TOKEN', result.token)
+          // const result = response
+          // storage.set(ACCESS_TOKEN, result.token, new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+          // commit('SET_TOKEN', result.token)
+          storage.set(ACCESS_TOKEN,response.token)
+          // dispatch('GetInfo')
+          commit('SET_TOKEN',response.token)
           resolve()
         }).catch(error => {
           reject(error)
@@ -54,29 +61,31 @@ const user = {
       return new Promise((resolve, reject) => {
         // 请求后端获取用户信息 /api/user/info
         getInfo().then(response => {
-          const { result } = response
-          if (result.role && result.role.permissions.length > 0) {
-            const role = { ...result.role }
-            role.permissions = result.role.permissions.map(permission => {
-              const per = {
-                ...permission,
-                actionList: (permission.actionEntitySet || {}).map(item => item.action)
-               }
-              return per
-            })
-            role.permissionList = role.permissions.map(permission => { return permission.permissionId })
-            // 覆盖响应体的 role, 供下游使用
-            result.role = role
+          commit('SET_USERINFO',response)
+          resolve(response)
+          console.log(response,'-----------result')
+          // if (result.role && result.role.permissions.length > 0) {
+          //   const role = { ...result.role }
+          //   role.permissions = result.role.permissions.map(permission => {
+          //     const per = {
+          //       ...permission,
+          //       actionList: (permission.actionEntitySet || {}).map(item => item.action)
+          //      }
+          //     return per
+          //   })
+          //   role.permissionList = role.permissions.map(permission => { return permission.permissionId })
+          //   // 覆盖响应体的 role, 供下游使用
+          //   result.role = role
 
-            commit('SET_ROLES', role)
-            commit('SET_INFO', result)
-            commit('SET_NAME', { name: result.name, welcome: welcome() })
-            commit('SET_AVATAR', result.avatar)
-            // 下游
-            resolve(result)
-          } else {
-            reject(new Error('getInfo: roles must be a non-null array !'))
-          }
+          //   commit('SET_ROLES', role)
+          //   commit('SET_INFO', result)
+          //   commit('SET_NAME', { name: result.name, welcome: welcome() })
+          //   commit('SET_AVATAR', result.avatar)
+          //   // 下游
+          //   resolve(result)
+          // } else {
+          //   reject(new Error('getInfo: roles must be a non-null array !'))
+          // }
         }).catch(error => {
           reject(error)
         })

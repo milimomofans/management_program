@@ -1,7 +1,8 @@
 import request from '@/utils/request'
+import qs from 'qs'
 
 const userApi = {
-  Login: '/auth/login',
+  Login: '/login',
   Logout: '/auth/logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
@@ -9,7 +10,7 @@ const userApi = {
   SendSms: '/account/sms',
   SendSmsErr: '/account/sms_err',
   // get my info
-  UserInfo: '/user/info',
+  UserInfo: '/manager/detail',
   UserMenu: '/user/nav'
 }
 
@@ -28,7 +29,10 @@ export function login (parameter) {
   return request({
     url: userApi.Login,
     method: 'post',
-    data: parameter
+    data: qs.stringify(parameter),
+    headers:{
+      'Content-Type':'application/x-www-form-urlencoded'
+    }
   })
 }
 
