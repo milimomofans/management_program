@@ -8,17 +8,17 @@
       @submit="handleSubmit"
     >
       <a-form-item>
-          <a-input
-            size="large"
-            type="text"
-            :placeholder="$t('user.login.username.placeholder')"
-            v-decorator="[
-              'username',
-              {rules: [{ required: true, message: $t('user.userName.required') }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
-            ]"
-          >
-            <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-          </a-input>
+        <a-input
+          size="large"
+          type="text"
+          :placeholder="$t('user.login.username.placeholder')"
+          v-decorator="[
+            'username',
+            {rules: [{ required: true, message: $t('user.userName.required') }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
+          ]"
+        >
+          <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+        </a-input>
       </a-form-item>
 
       <a-form-item>
