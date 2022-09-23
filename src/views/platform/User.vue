@@ -26,8 +26,8 @@
                             </a-select>
                         </a-form-item>
                     </a-col>
-                    <a-button type="primary" @click="test">查询</a-button>
-                    <a-button style="margin-left:8px" @click="reset">重置</a-button>
+                    <a-button type="primary">查询</a-button>
+                    <a-button style="margin-left:8px">重置</a-button>
                 </a-row>
             </a-form>
             <s-table
@@ -35,48 +35,83 @@
                 size="default"
                 :columns="columns"
                 :data="loadData"
-                showPagination="auto"
+                rowKey="id"
             >
-                <span slot=""></span>
+                <template slot="status" slot-scope="text, record">
+                    <a-switch :checked="Boolean(record.status)" @change="switchHandle($event,record)" />
+                </template>
+                <template slot="superManager" slot-scope="text, record">
+                    <span >{{record.superManager ? '是' : '否'}}</span>
+                </template>
+                <template slot="action">
+                    <div>
+                        <a-button type="primary">编辑昵称</a-button>
+                        <a-button type="danger">修改密码</a-button>
+                    </div>
+                </template>      
             </s-table>
         </a-card>
     </page-header-wrapper>
 </template>
 <script>
-import { getPlatformUser } from '@/api/platform'
+import { getPlatformUser, enableUserApi, disableUserApi } from '@/api/platform'
 import { STable } from '@/components'
 const columns = [
     {
         title:'用户名',
-        dataIndex:'username'
+        dataIndex:'username',
+        key:'username',
+        ellipsis:true,
+        align:'center'
     },
     {
         title:'昵称',
-        dataIndex:'nickname'
-    },
-    {
-        title:'状态',
-        dataIndex:'status'
+        dataIndex:'nickname',
+        key:'nickname',
+        ellipsis:true,
+        align:'center'
     },
     {
         title:'登录次数',
-        dataIndex:'loginNum'
+        dataIndex:'loginNum',
+        align:'center'
     },
     {
         title:'是否是超级管理员',
-        dataIndex:'supperManager'
+        dataIndex:'superManager',
+        scopedSlots: { customRender: 'superManager' },
+        align:'center'
     },
     {
         title:'最后登录时间',
-        dataIndex:'lastLoginTime'
+        dataIndex:'lastLoginTime',
+        ellipsis:true,
+        align:'center'
     },
     {
         title:'最后登录IP',
-        dataIndex:'lastLoginIp'
+        dataIndex:'lastLoginIp',
+        ellipsis:true,
+        align:'center'
     },
     {
         title:'创建时间',
-        dataIndex:'createTime'
+        dataIndex:'createTime',
+        ellipsis:true,
+        align:'center'
+    },
+    {
+        title:'状态',
+        dataIndex:'status',
+        scopedSlots: { customRender: 'status' },
+        align:'center'
+    },
+    {
+        title: '操作',
+        dataIndex: 'action',
+        width: '150px',
+        scopedSlots: { customRender: 'action' },
+        align:'center'
     }
 ]
 
@@ -110,7 +145,15 @@ export default {
             loadData:parameter => {
                 const requestParameters = {...parameter,...this.queryParam}
                 return getPlatformUser(requestParameters).then(res=>{
-                    return res.data
+                    const _data = {
+                        data:res.data,
+                        pageNo:res.no,
+                        pageSize:res.size,
+                        totalPage:res.totalPage,
+                        totalCount:res.total
+                    }
+                    
+                    return _data
                 })
             }
         }
@@ -129,9 +172,22 @@ export default {
                     ...pageParam
                 }
             getPlatformUser(_queryParam).then(res=>{
-                console.log(res,'----result')
+                console.log(res.data,'----result')
                 return res.data
             })
+        },
+        switchHandle(status,param) {
+            console.log(status)
+            console.log(param)
+            const { id } = param
+            const { loadData } = this
+            console.log(loadData)
+            // const ApiPromise = status ? disableUserApi : enableUserApi
+            // ApiPromise(id).then(res=>{
+            //     // console.log(this.loadData)
+            //     // console.log(loadData)
+            // })
+
         }
     }
 
