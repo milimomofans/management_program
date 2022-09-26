@@ -1,10 +1,12 @@
 import request from '@/utils/request'
+import qs from 'qs'
 
 export function getPlatformUser ( parameter ) {
+    console.log(parameter)
     return request({
         url:'/manager',
         method:'get',
-        param:parameter
+        params:parameter
     })
 }
 
@@ -27,17 +29,31 @@ export function disableUserApi ( id ) {
 // 修改用户昵称
 export function editorNickNameApi (id,nickname) {
     return request({
-        url:`/manager/${id}`
+        url:`/manager/${id}`,
+        method:'put',
+        data:qs.stringify({
+            nickname
+        })
     })
 }
 
 // 修改用户密码
-export function changepwd ( { oldPassword, password }) {
+export function changepwd ( { oldPassword, password }, id) {
     return request({
         url:`/manager/${id}/changepwd`,
-        param:{
+        method:'put',
+        data:qs.stringify({
             oldPassword,
             password
-        }
+        })
+    })
+}
+
+// 添加平台管理员
+export function addPlatformApi ( param ) {
+    return request({
+        url:'/manager',
+        method:'post',
+        data:qs.stringify(param)
     })
 }

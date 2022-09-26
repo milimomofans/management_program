@@ -134,6 +134,20 @@ export default {
       this.loadData()
     },
     /**
+     * 获取当前页码的数据
+     */
+    getLocalDataSource () {
+      return this.localDataSource
+    },
+    /**
+     * 
+     * 存储新的localDataSource
+     */
+    setLocalDataSource ( newLocalDataSource) {
+      this.localDataSource = newLocalDataSource
+    },
+    
+    /**
      * 加载数据方法
      * @param {Object} pagination 分页选项器
      * @param {Object} filters 过滤条件

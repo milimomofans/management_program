@@ -57,10 +57,16 @@ request.interceptors.response.use((response) => {
   const { status } = response
   switch(status) {
     case 200:
-      const { data, code } = response.data
+      const { data, code, msg } = response.data
       switch(code) {
         case 200:
           return data
+        default:
+          notification.error({
+            message: '出错啦',
+            description: msg
+          })
+          return Promise.reject(data)
       }
 
   }

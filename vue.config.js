@@ -31,10 +31,14 @@ const assetsCDN = {
   css: [],
   // https://unpkg.com/browse/vue@2.6.10/
   js: [
-    '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
-    '//cdn.jsdelivr.net/npm/vue-router@3.5.1/dist/vue-router.min.js',
-    '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
-    '//cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js'
+    // '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
+    // '//cdn.jsdelivr.net/npm/vue-router@3.5.1/dist/vue-router.min.js',
+    // '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
+    // '//cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js'
+    '//lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.14/vue.min.js',
+    '//lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue-router/3.5.1/vue-router.min.js',
+    '//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/vuex/3.1.1/vuex.min.js',
+    '//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/axios/0.21.1/axios.min.js'
   ]
 }
 

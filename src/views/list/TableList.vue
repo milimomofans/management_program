@@ -243,6 +243,7 @@ export default {
     },
     handleEdit (record) {
       this.visible = true
+      console.log(record)
       this.mdl = { ...record }
     },
     handleOk () {

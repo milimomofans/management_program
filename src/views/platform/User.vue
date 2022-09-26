@@ -26,8 +26,11 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-button type="primary">查询</a-button>
-          <a-button style="margin-left:8px">重置</a-button>
+          <a-col :md="6">
+            <a-button type="primary" @click="platformModalHandle">添加管理员</a-button>
+            <a-button style="margin-left:10px" @click="refreshHandle">查询</a-button>
+            <a-button type="danger" style="margin-left:10px" @click="onReset">重置</a-button>
+          </a-col>
         </a-row>
       </a-form>
       <s-table
@@ -36,26 +39,35 @@
         :columns="columns"
         :data="loadData"
         rowKey="id"
+        
+        style="margin-top:20px"
       >
+        <template slot="nickname"  slot-scope="text, record, index">
+           <editable-cell :ref="'cell' + index" :text="text" @change="onCellChange(record, index, $event)" />
+        </template>
         <template slot="status" slot-scope="text, record">
-          <a-switch :checked="Boolean(record.status)" @change="switchHandle($event,record)" />
+          <a-switch :checked="record.status === 1 ? true : false" @change="switchHandle($event,record)" />
         </template>
         <template slot="superManager" slot-scope="text, record">
           <span >{{ record.superManager ? '是' : '否' }}</span>
         </template>
-        <template slot="action">
-          <div>
-            <a-button type="primary">编辑昵称</a-button>
-            <a-button type="danger">修改密码</a-button>
+        <template slot="action" slot-scope="text, record">
+          <div class="flex">
+            <a-button type="primary" @click="pwdModalHandle(record)">修改密码</a-button>
           </div>
         </template>      
       </s-table>
+      <PasswordModal ref="pwdModal" :param="modalParam" />
+      <AddPlatformModal ref="addModal" @onRefresh="refreshHandle" />
     </a-card>
   </page-header-wrapper>
 </template>
 <script>
-import { getPlatformUser, enableUserApi, disableUserApi } from '@/api/platform'
+import { getPlatformUser, enableUserApi, disableUserApi, editorNickNameApi  } from '@/api/platform'
 import { STable } from '@/components'
+import PasswordModal from './components/PasswordModal.vue'
+import AddPlatformModal from './components/AddPlatform.vue'
+import EditableCell from './components/EditableCell.vue'
 const columns = [
     {
         title:'用户名',
@@ -69,7 +81,8 @@ const columns = [
         dataIndex:'nickname',
         key:'nickname',
         ellipsis:true,
-        align:'center'
+        align:'center',
+        scopedSlots: { customRender: 'nickname' },
     },
     {
         title:'登录次数',
@@ -109,7 +122,7 @@ const columns = [
     {
         title: '操作',
         dataIndex: 'action',
-        width: '150px',
+        width: '120px',
         scopedSlots: { customRender: 'action' },
         align:'center'
     }
@@ -144,6 +157,7 @@ export default {
             columns,
             loadData:parameter => {
                 const requestParameters = {...parameter,...this.queryParam}
+                console.log(requestParameters,'---------------------------')
                 return getPlatformUser(requestParameters).then(res=>{
                     const _data = {
                         data:res.data,
@@ -155,11 +169,15 @@ export default {
                     
                     return _data
                 })
-            }
+            },
+            modalParam:{}
         }
     },
     components:{
-        STable
+        STable,
+        EditableCell,
+        PasswordModal,
+        AddPlatformModal
     },
     mounted(){
         this.getList()
@@ -177,19 +195,59 @@ export default {
             })
         },
         switchHandle(status,param) {
-            console.log(status)
-            console.log(param)
+            const localData = this.$refs['table'].getLocalDataSource()
             const { id } = param
-            const { loadData } = this
-            console.log(loadData)
-            // const ApiPromise = status ? disableUserApi : enableUserApi
-            // ApiPromise(id).then(res=>{
-            //     // console.log(this.loadData)
-            //     // console.log(loadData)
-            // })
-
+            // 返回的status是需要变换的status
+            const ApiPromise = !status ? disableUserApi : enableUserApi
+            ApiPromise(id).then(()=>{
+               localData.map(item => {
+                  if (item.id === param.id) {
+                    return item.status = status ? 1 : 2
+                  }
+                })
+            })
+        },
+        onCellChange(param, index, value) {
+          console.log(value)
+          console.log(param)
+          editorNickNameApi(param.id, param.nickname).then(res => {
+            console.log('进来了')
+            const localData = this.$refs['table'].getLocalDataSource()
+            localData.map(item => {
+              if (item.id === param.id) {
+                return item.nickname = value
+              }
+            })
+            this.$refs['cell' + index].closeEdit()
+          })
+          .catch(()=>{
+            this.$refs['cell' + index].refresh()
+          })
+        },
+        pwdModalHandle(param) {
+          this.modalParam = param
+          this.$refs['pwdModal'].open()
+        },
+        refreshHandle(){
+          this.$refs.table.refresh()
+        },
+        platformModalHandle(){
+          this.$refs['addModal'].open()
+        },
+        onReset(){
+          this.queryParam = {
+            nickname:'',
+            username:'',
+            status:''
+          }
+          this.refreshHandle()
         }
     }
 
 }
 </script>
+<style lang="less" scoped>
+  .flex {
+    display: flex;
+  }
+</style>
