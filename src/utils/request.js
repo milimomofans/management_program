@@ -49,7 +49,6 @@ request.interceptors.request.use(config => {
   if (token) {
     config.headers[ACCESS_TOKEN] = 'Bearer ' + token
   }
-  console.log(config,'[-----------------config')
   return config
 }, errorHandler)
 

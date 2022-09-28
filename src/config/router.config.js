@@ -27,6 +27,12 @@ export const asyncRouterMap = [
             name:'PlatformUser',
             component:() => import('@/views/platform/User'),
             meta: { title: '用户管理', keepAlive: false, permission: [] }
+          },
+          {
+            path:'/platform/project',
+            name:'PlatformProject',
+            component:() => import('@/views/platform/Project'),
+            meta: { title: '项目管理', keepAlive: false, permission: [] }
           }
         ]
       },
