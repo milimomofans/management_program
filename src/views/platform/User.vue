@@ -5,12 +5,12 @@
         <a-row :gutter="24">
           <a-col :md="6">
             <a-form-item label="平台用户昵称">
-              <a-input v-model="queryParam.nickname" placeholder="请输入平台用户昵称" />
+              <a-input style="width:150px" v-model="queryParam.nickname" placeholder="请输入平台用户昵称" />
             </a-form-item>   
           </a-col>
           <a-col :md="6">
             <a-form-item label="平台用户名">
-              <a-input v-model="queryParam.username" placeholder="请输入平台用户名" />
+              <a-input  style="width:150px" v-model="queryParam.username" placeholder="请输入平台用户名" />
             </a-form-item>
           </a-col>
           <a-col :md="6">
@@ -27,7 +27,7 @@
             </a-form-item>
           </a-col>
           <a-col :md="6">
-            <a-button type="primary" @click="platformModalHandle">添加管理员</a-button>
+            <a-button type="primary" v-action:platformModalHandle @click="platformModalHandle">添加管理员</a-button>
             <a-button style="margin-left:10px" @click="refreshHandle">查询</a-button>
             <a-button type="danger" style="margin-left:10px" @click="onReset">重置</a-button>
           </a-col>
@@ -39,21 +39,21 @@
         :columns="columns"
         :data="loadData"
         rowKey="id"
-        
+        :showPagination="true"
         style="margin-top:20px"
       >
         <template slot="nickname"  slot-scope="text, record, index">
            <editable-cell :ref="'cell' + index" :text="text" @change="onCellChange(record, index, $event)" />
         </template>
         <template slot="status" slot-scope="text, record">
-          <a-switch :checked="record.status === 1 ? true : false" @change="switchHandle($event,record)" />
+          <a-switch :disabled="userInfo.superManager ? userInfo.id == record.id : true " :checked="record.status === 1 ? true : false" @change="switchHandle($event,record)" />
         </template>
         <template slot="superManager" slot-scope="text, record">
           <span >{{ record.superManager ? '是' : '否' }}</span>
         </template>
         <template slot="action" slot-scope="text, record">
           <div class="flex">
-            <a-button type="primary" @click="pwdModalHandle(record)">修改密码</a-button>
+            <a-button type="primary" :disabled="userInfo.superManager ? false : !(userInfo.id === record.id) " @click="pwdModalHandle(record)" >修改密码</a-button>
           </div>
         </template>      
       </s-table>
@@ -64,6 +64,7 @@
 </template>
 <script>
 import { getPlatformUser, enableUserApi, disableUserApi, editorNickNameApi  } from '@/api/platform'
+import { mapGetters } from 'vuex'
 import { STable } from '@/components'
 import PasswordModal from './components/PasswordModal.vue'
 import AddPlatformModal from './components/AddPlatform.vue'
@@ -157,7 +158,6 @@ export default {
             columns,
             loadData:parameter => {
                 const requestParameters = {...parameter,...this.queryParam}
-                console.log(requestParameters,'---------------------------')
                 return getPlatformUser(requestParameters).then(res=>{
                     const _data = {
                         data:res.data,
@@ -178,6 +178,11 @@ export default {
         EditableCell,
         PasswordModal,
         AddPlatformModal
+    },
+    computed:{
+      ...mapGetters([
+        'userInfo'
+      ])
     },
     mounted(){
         this.getList()

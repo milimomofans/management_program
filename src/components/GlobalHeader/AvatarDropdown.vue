@@ -2,7 +2,7 @@
   <a-dropdown v-if="currentUser && currentUser.name" placement="bottomRight">
     <span class="ant-pro-account-avatar">
       <a-avatar size="small" src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" class="antd-pro-global-header-index-avatar" />
-      <span>{{ currentUser.name }}</span>
+      <span>{{ userInfo.nickname }}</span>
     </span>
     <template v-slot:overlay>
       <a-menu class="ant-pro-drop-down menu" :selected-keys="[]">
@@ -29,6 +29,7 @@
 
 <script>
 import { Modal } from 'ant-design-vue'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'AvatarDropdown',
@@ -41,6 +42,11 @@ export default {
       type: Boolean,
       default: true
     }
+  },
+  computed:{
+    ...mapGetters([
+      'userInfo'
+    ])
   },
   methods: {
     handleToCenter () {

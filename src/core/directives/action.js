@@ -14,20 +14,15 @@ import store from '@/store'
  *
  *  @see https://github.com/vueComponent/ant-design-vue-pro/pull/53
  */
+
+// 如果不是superManager就隐藏掉el
 const action = Vue.directive('action', {
-  inserted: function (el, binding, vnode) {
-    const actionName = binding.arg
-    const roles = store.getters.roles
-    const elVal = vnode.context.$route.meta.permission
-    const permissionId = Object.prototype.toString.call(elVal) === '[object String]' && [elVal] || elVal
-    roles.permissions.forEach(p => {
-      if (!permissionId.includes(p.permissionId)) {
-        return
-      }
-      if (p.actionList && !p.actionList.includes(actionName)) {
-        el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
-      }
-    })
+  inserted: function (el) {
+    const userInfo = store.getters.userInfo
+    if (userInfo.superManager) {
+      return
+    }
+    el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
   }
 })
 
