@@ -13,12 +13,12 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: 'menu.home' },
-    redirect: '/dashboard/workplace',
+    redirect: '/platform/user',
     children: [
       {
         path:'/platform',
         name:'平台用户管理',
-        redirect:'',
+        redirect:'/platform/user',
         component:RouteView,
         meta: { title: '平台用户管理', keepAlive: true, icon:'user-add', permission: [] },
         children:[
@@ -27,11 +27,19 @@ export const asyncRouterMap = [
             name:'PlatformUser',
             component:() => import('@/views/platform/User'),
             meta: { title: '用户管理', keepAlive: false, permission: [] }
-          },
+          }
+        ]
+      },
+      {
+        path:'/prject',
+        name:'Project',
+        component:RouteView,
+        meta: { title: '项目管理', keepAlive: true, icon: 'profile', permission: [] },
+        children: [
           {
-            path:'/platform/project',
-            name:'PlatformProject',
-            component:() => import('@/views/platform/Project'),
+            path:'/prject/projectList',
+            name:'ProjectList',
+            component: () => import('@/views/project/Project'),
             meta: { title: '项目管理', keepAlive: false, permission: [] }
           }
         ]

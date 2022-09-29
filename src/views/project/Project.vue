@@ -1,12 +1,24 @@
 <template>
     <page-header-wrapper>
         <a-card>
-            <a-form :form="queryParam">
-                <a-form-item label="项目名称">
-                    <a-input v-model="queryParam.name" />
-                </a-form-item>
-                <a-button type="primary">查询</a-button>
+            <a-form :form="queryParam" layout="inline">
+                <a-row :gutter="24">
+                    <a-col :md="6">
+                        <a-form-item label="项目名称">
+                            <a-input v-model="queryParam.name" />
+                        </a-form-item>
+                    </a-col>
+                    <a-col :md="6">
+                        <a-button type="primary">查询</a-button>
+                    </a-col>
+                </a-row>
             </a-form>
+            <a-button style="margin-top: 20px;">
+                <template #icon>
+                    <to-top-outlined />
+                </template>
+                新增项目
+            </a-button>
             <s-table
                 ref="table"
                 size="default"
@@ -16,13 +28,20 @@
                 :showPagination="true"
                 style="margin-top:20px"
             >
+                <template slot="status" slot-scope="text, record">
+                    <a-switch :checked="record.status == 1 ? true : false" @change="switchHandle($event,record)" />
+                </template>
+                <template slot="action">
+                    <a-button>查看项目</a-button>
+                </template>
             </s-table>
         </a-card>
     </page-header-wrapper>
 </template>
 <script>
 import { STable } from '@/components'
-import { getProjectList } from '../../api/project' 
+import { getProjectList, enableProject, disableProject  } from '../../api/project' 
+import { topTopOutlined } from '@ant-design/icons-vue'
 const columns = [
     {
         title:'项目名称',
@@ -86,6 +105,20 @@ const columns = [
         key:'updateTime',
         ellipsis:true,
         align:'center'
+    },
+    {
+        title:'状态',
+        dataIndex:'status',
+        key:'status',
+        scopedSlots: { customRender: 'status' },
+        align:'center'
+    },
+    {
+        title:'操作',
+        dataIndex:'action',
+        width:'120px',
+        scopedSlots: { customRender: 'action' },
+        align:'center'
     }
 ]
 export default {
@@ -97,7 +130,7 @@ export default {
             },
             loadData:parameter => {
                 const requestParameters = { ...parameter, ...this.queryParam }
-                getProjectList(requestParameters).then(res => {
+                return getProjectList(requestParameters).then(res => {
                     const _data = {
                         data:res.data,
                         pageNo:res.no,
@@ -112,10 +145,22 @@ export default {
         }
     },
     components:{
-        STable
+        STable,
+        topTopOutlined
     },
     methods:{
-
+        switchHandle(status,param) {
+            const localData = this.$refs['table'].getLocalDataSource()
+            const { id } = param
+            const ApiPromise = !status ? disableProject : enableProject
+            ApiPromise(id).then(()=>{
+                localData.map(item => {
+                    if (item.id === param.id) {
+                        return item.status = status ? 1 : 0
+                    }
+                })
+            })
+        }
     }
 }
 </script>
